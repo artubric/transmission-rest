@@ -16,16 +16,22 @@ func New(conf *config.TransmissionServer) *TransmissionService {
 	advancedConfig := &trpc.AdvancedConfig{
 		Port: conf.Port,
 	}
-	client, err := trpc.New(
+	fmt.Println("Connecting to transmission remote client... ")
+	client, _ := trpc.New(
 		conf.Host,
 		conf.Username,
 		conf.Password,
 		advancedConfig,
 	)
-	if err != nil {
-		panicError := fmt.Errorf("failed to connect to remote transmission server with error:\n%+v", err)
-		panic(panicError)
+
+	// use as sanity, since error on client creation is empty
+	ok, version, minVersion, err := client.RPCVersion(context.TODO())
+	if ok {
+		fmt.Printf("server allowed versions: %d - %d", minVersion, version)
+	} else {
+		panic(fmt.Errorf("failed to fetch transmission rpc version with error:\n%+v", err))
 	}
+	fmt.Println("Done. ")
 
 	ts := &TransmissionService{
 		client: client,

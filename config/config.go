@@ -64,9 +64,9 @@ func getConfigSource() string {
 	var configSource string
 	isProduction := getEnvBool("IS_PROD", false)
 	if isProduction {
-		configSource = "config/PROD.env"
+		configSource = "config/.env.prod"
 	} else {
-		configSource = "config/LOCAL.env"
+		configSource = "config/.env.local"
 	}
 	return configSource
 }

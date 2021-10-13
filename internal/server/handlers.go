@@ -1,6 +1,7 @@
 package server
 
 import (
+	"artubric/transmission-rest/internal/model"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 )
 
 func (s *Server) handleTorrentsV1(w http.ResponseWriter, r *http.Request) {
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -24,13 +26,18 @@ func (s *Server) handleTorrentsV1(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotImplemented)
 	case http.MethodPost:
 		// TODO: seperate logic
-		// unmarshal JSON => mode
+		// unmarshal JSON => model
+		var addTorrentRequest model.AddTorrentRequest
 		var addTorrentPayload trpc.TorrentAddPayload
-		err = json.Unmarshal(body, &addTorrentPayload)
+
+		err = json.Unmarshal(body, &addTorrentRequest)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		addTorrentPayload.Filename = &addTorrentRequest.Filename
+		addTorrentPayload.DownloadDir = &addTorrentRequest.DownloadDir
 
 		// pass model to appropriate method
 		torrent, err := s.transServ.CreateNewTorrent(r.Context(), addTorrentPayload)
@@ -49,6 +56,7 @@ func (s *Server) handleTorrentsV1(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorJSON)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(torrentJSON)
 	default:

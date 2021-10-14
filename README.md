@@ -1,11 +1,12 @@
 # transmission-rest
 
-is a CRUD REST interface for transmission's RPC. Written in Go using `github.com/hekmon/transmissionrpc/v2`
+a CRUD REST interface for transmission's RPC. Written in Go using `github.com/hekmon/transmissionrpc/v2`
 
 ### Configuration
 
 Empty config files are stored in `config\.env.[local|prod]`<BR>
 If `IS_PROD` env variable is set to true, then env.prod is used. Otherwise env.local <br>
+Config sample: <br>
 
 ```
 # transmission (if running in docker on localhost, use "host" network driver to reach transmission host)

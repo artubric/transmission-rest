@@ -2,6 +2,7 @@ package transmissionService
 
 import (
 	"artubric/transmission-rest/config"
+	"artubric/transmission-rest/internal/model"
 	"context"
 	"fmt"
 
@@ -24,10 +25,10 @@ func New(conf *config.TransmissionServer) *TransmissionService {
 		advancedConfig,
 	)
 
-	// use as sanity, since error on client creation is empty
+	// use as sanity, since err on client creation is empty
 	ok, version, minVersion, err := client.RPCVersion(context.TODO())
 	if ok {
-		fmt.Printf("server allowed versions: %d - %d", minVersion, version)
+		fmt.Printf("server allowed versions: %d - %d\n", minVersion, version)
 	} else {
 		panic(fmt.Errorf("failed to fetch transmission rpc version with error:\n%+v", err))
 	}
@@ -40,12 +41,14 @@ func New(conf *config.TransmissionServer) *TransmissionService {
 	return ts
 }
 
-func (ts *TransmissionService) CreateNewTorrent(ctx context.Context, payload trpc.TorrentAddPayload) (trpc.Torrent, error) {
+func (ts *TransmissionService) CreateNewTorrent(ctx context.Context, atr *model.AddTorrentRequest) (trpc.Torrent, error) {
 
-	torrent, err := ts.client.TorrentAdd(ctx, payload)
-	if err != nil {
-		return torrent, err
-	}
+	torrent, err := ts.client.TorrentAdd(ctx,
+		trpc.TorrentAddPayload{
+			DownloadDir: &atr.DownloadDir,
+			Filename:    &atr.Filename,
+		},
+	)
 
-	return torrent, nil
+	return torrent, err
 }

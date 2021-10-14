@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-
-	trpc "github.com/hekmon/transmissionrpc/v2"
 )
 
 func (s *Server) handleTorrentsV1(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +26,6 @@ func (s *Server) handleTorrentsV1(w http.ResponseWriter, r *http.Request) {
 		// TODO: seperate logic
 		// unmarshal JSON => model
 		var addTorrentRequest model.AddTorrentRequest
-		var addTorrentPayload trpc.TorrentAddPayload
 
 		err = json.Unmarshal(body, &addTorrentRequest)
 		if err != nil {
@@ -36,11 +33,8 @@ func (s *Server) handleTorrentsV1(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		addTorrentPayload.Filename = &addTorrentRequest.Filename
-		addTorrentPayload.DownloadDir = &addTorrentRequest.DownloadDir
-
 		// pass model to appropriate method
-		torrent, err := s.transServ.CreateNewTorrent(r.Context(), addTorrentPayload)
+		torrent, err := s.transServ.CreateNewTorrent(r.Context(), &addTorrentRequest)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			errorJSON, _ := json.Marshal(err)

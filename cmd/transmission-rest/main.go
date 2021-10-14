@@ -9,7 +9,7 @@ import (
 
 func main() {
 	conf := config.Load()
-	transService := tserv.New(&conf.TransmissionServer)
-	server := server.New(&conf.RestServer, transService)
+	transmissionService := tserv.New(&conf.TransmissionServer)
+	server := server.New(&conf.RestServer, transmissionService)
 	server.Run()
 }
